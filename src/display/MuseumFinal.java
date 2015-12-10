@@ -41,7 +41,7 @@ public class MuseumFinal extends PApplet {
 	public static final int showTime = 6000;
 
 	public static final int cutAmount = 250;
-	public static final int interactionSteps = 10;
+	public static final int interactionSteps = 5;
 
 	private MovementHandler movementHandler;
 	private OSCReceiver receiver;
@@ -56,6 +56,7 @@ public class MuseumFinal extends PApplet {
 
 	@Override
 	public void settings() {
+
 		size(1280, 800, P2D);
 		// fullScreen(P2D);
 		smooth(8);
@@ -72,7 +73,7 @@ public class MuseumFinal extends PApplet {
 
 		glass = new GlassPlane(this, maxImageWidth, maxImageHeight);
 
-		generator = new ContentGenerator(this, "/Users/Moritz/Dropbox/test2",
+		generator = new ContentGenerator(this, "/Users/Moritz/Dropbox/TellImage",
 				"/Users/Moritz/Dropbox/TellVideo");
 
 		//
@@ -139,21 +140,55 @@ public class MuseumFinal extends PApplet {
 
 					if (glass.getCrack().getStage() == Stage.WHOLE) {
 
-						glass.getCrack().breakParts(this, box2dWorld, mouseX, mouseY, 1, PVector.random2D());
-//						if (movementHandler.updateReady()) {
-//
-//							Iterator<Person> iterator = movementHandler.getPersons().values()
-//									.iterator();
-//							while (iterator.hasNext()) {
-//
-//								Person person = iterator.next();
-//								PVector centroid = person.getCentroid();
-//								centroid.x *= width;
-//								System.out.println(centroid.z);
-//								glass.getCrack().breakParts(this, box2dWorld, centroid.x,
-//										height / 2, 1, PVector.random2D());
-//							}
-//						}
+						// glass.getCrack().breakParts(this, box2dWorld, mouseX,
+						// mouseY, 1, PVector.random2D());
+						if (movementHandler.updateReady()) {
+
+							Iterator<Person> iterator = movementHandler.getPersons().values()
+									.iterator();
+							while (iterator.hasNext()) {
+
+								Person person = iterator.next();
+								PVector centroid = person.getCentroid();
+								PVector velocity = person.getVelocity();
+
+								if (velocity == null) {
+									velocity = PVector.random2D();
+								}
+								centroid.x *= width;
+
+								// how much will break
+								if (centroid.y < 0.2) {
+
+									glass.getCrack().breakParts(this, box2dWorld, centroid.x,
+											height / 2, 1, velocity);
+								} else {
+									if (centroid.y < 0.4) {
+
+										glass.getCrack().breakParts(this, box2dWorld, centroid.x,
+												height / 2, 2, velocity);
+									} else {
+										if (centroid.y < 0.6) {
+
+											glass.getCrack().breakParts(this, box2dWorld,
+													centroid.x, height / 2, 3, velocity);
+										} else {
+											if (centroid.y < 0.8) {
+
+												glass.getCrack().breakParts(this, box2dWorld,
+														centroid.x, height / 2, 4, velocity);
+											} else {
+												if (centroid.y < 1) {
+
+													glass.getCrack().breakCrack(this, box2dWorld,
+															velocity);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -286,6 +321,7 @@ public class MuseumFinal extends PApplet {
 
 		if (glass != null) {
 			if (glass.getCrack() != null) {
+
 				glass.getCrack().breakCrack(this, box2dWorld, PVector.random2D());
 			}
 		}
