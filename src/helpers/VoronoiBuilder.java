@@ -28,7 +28,6 @@ public class VoronoiBuilder {
 
 		ArrayList<Fragment> fragments = new ArrayList<Fragment>();
 		ArrayList<Fragment> hiddenFragments = new ArrayList<Fragment>();
-		HashSet<Line> lines = new HashSet<Line>();
 
 		ArrayList<PVector> boundingBox = MathHelpers.createBoundingVectors(centerX, centerY,
 				width + 1, height + 1);
@@ -82,8 +81,54 @@ public class VoronoiBuilder {
 			}
 
 		}
+		
+		for (Fragment fragment : fragments) {
+			
+			checkForNeighbors(fragments, hiddenFragments, fragment);
+		}
 
 		return new Crack(fragments, hiddenFragments, centerX, centerY, width, height);
+	}
+
+	private static void checkForNeighbors(ArrayList<Fragment> fragments,
+			ArrayList<Fragment> hiddenFragments, Fragment fragment) {
+
+		// for every fragment that has already been added
+		for (Fragment fragment2 : fragments) {
+
+			// check all lines
+			for (Line line2 : fragment2.getLines()) {
+
+				// agains the lines of the new fragment
+				for (Line line : fragment.getLines()) {
+
+					// if we have matching lines, they are neighbors
+					if (line2.getStart().equals(line.getStart())
+							&& line2.getEnd().equals(line.getEnd())) {
+
+						fragment.addNeighbor(fragment2);
+						fragment2.addNeighbor(fragment);
+					}
+				}
+			}
+		}
+
+		// Same for hidden fragments
+		for (Fragment fragment2 : hiddenFragments) {
+
+			for (Line line2 : fragment2.getLines()) {
+
+				for (Line line : fragment.getLines()) {
+
+					// if we have matching lines, they are neighbors
+					if (line2.getStart().equals(line.getStart())
+							&& line2.getEnd().equals(line.getEnd())) {
+
+						fragment.setBorderFragment(true);
+					}
+				}
+			}
+		}
 	}
 
 	private static void addLines(Fragment fragment, LineType type, float centerX, float centerY) {
@@ -98,9 +143,9 @@ public class VoronoiBuilder {
 			PVector line2 = lineVectors.get(i);
 			if (type == LineType.OUTER) {
 				if ((line1.x < 0 || line1.x > MuseumFinal.maxImageWidth || line1.y < 0
-						|| line1.y > MuseumFinal.maxImageHeight)
-						|| line2.x < 0 || line2.x > MuseumFinal.maxImageWidth || line2.y < 0
-								|| line2.y > MuseumFinal.maxImageHeight) {
+						|| line1.y > MuseumFinal.maxImageHeight) || line2.x < 0
+						|| line2.x > MuseumFinal.maxImageWidth || line2.y < 0
+						|| line2.y > MuseumFinal.maxImageHeight) {
 
 					calc = true;
 					ArrayList<PVector> temporaryLines = new ArrayList<PVector>();
@@ -131,9 +176,9 @@ public class VoronoiBuilder {
 		boolean calc = false;
 		if (type == LineType.OUTER) {
 			if ((line1.x < 0 || line1.x > MuseumFinal.maxImageWidth || line1.y < 0
-					|| line1.y > MuseumFinal.maxImageHeight)
-					|| line2.x < 0 || line2.x > MuseumFinal.maxImageWidth || line2.y < 0
-							|| line2.y > MuseumFinal.maxImageHeight) {
+					|| line1.y > MuseumFinal.maxImageHeight) || line2.x < 0
+					|| line2.x > MuseumFinal.maxImageWidth || line2.y < 0
+					|| line2.y > MuseumFinal.maxImageHeight) {
 
 				calc = true;
 				ArrayList<PVector> temporaryLines = new ArrayList<PVector>();
@@ -141,7 +186,7 @@ public class VoronoiBuilder {
 				temporaryLines.add(line2);
 				temporaryLines = SutherlandHodgmanClipping.clipPolygon(temporaryLines,
 						MuseumFinal.boundingWindowBox);
-				
+
 				if (temporaryLines.size() == 3) {
 					line1 = temporaryLines.get(0);
 					line2 = temporaryLines.get(2);

@@ -1,6 +1,7 @@
 package glass;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -145,19 +146,16 @@ public class Crack {
 		lastUpdate = System.currentTimeMillis();
 
 		// If there are less than half of the fragments break all
-		if (fragments.size() / 2 < crackAmount) {
-
-			breakCrack(p, box2d, velocity);
-		}
+		// if (fragments.size() / 2 < crackAmount) {
+		//
+		// breakCrack(p, box2d, velocity);
+		// }
 
 		// calculate rectangle size
 		float rectangleWidth = minInteractionWidthHeight.x * interactionStep;
 		float rectangleHeight = minInteractionWidthHeight.y * interactionStep;
 		if (rectangleWidth == 0 || rectangleHeight == 0)
 			return;
-
-		ArrayList<PVector> randomPolygon = RandomPolygonGenerator.generateRandomPolygon(xPoint,
-				yPoint, rectangleWidth, rectangleHeight);
 
 		ArrayList<PVector> temporaryBoundingBox = MathHelpers.createBoundingVectors(xPoint, yPoint,
 				rectangleWidth, rectangleHeight);
@@ -181,7 +179,7 @@ public class Crack {
 					if (!line.isVisible()) {
 						fragment.setVisible(line);
 					}
-					
+
 					fragmentIsInRange = true;
 				}
 			}
@@ -192,15 +190,13 @@ public class Crack {
 
 				// TODO maybe also use velocity?!
 				if (Math.random() < 0.01f) {
-					// TODO check velocity and angular values
-					box2dWorldPolygons.add(new Polygon(p, box2d, fragment, velocity, 5));
 
-					// Remove fragment from List, since it's broken out
-					fragment.setBroken(true);
+					breakFragment(fragment, p, box2d, velocity, 0);
 
 					crackAmount++;
 				}
 			}
+
 		}
 
 		/* Test all Fragments that CANNOUT break out */
@@ -260,8 +256,17 @@ public class Crack {
 
 		if (stage == Stage.FADING) {
 
-			if (visibility <= 0)
+			if (visibility <= 0) {
+
+				for (Polygon polygon : box2dWorldPolygons) {
+
+					if (!polygon.isDead())
+						polygon.kill();
+				}
+
 				stage = Stage.DEAD;
+
+			}
 
 			visibility -= 15;
 
@@ -272,4 +277,98 @@ public class Crack {
 			stage = Stage.FADING;
 		}
 	}
+
+	// public void breakLooseFragments(Fragment fragment, PApplet p,
+	// Box2DProcessing box2d,
+	// PVector velocity, int i) {
+	//
+	// boolean breaks = true;
+	//
+	// // Check all neighbors of the given fragment
+	// for (Fragment temporaryFragment : fragment.getNeighbors()) {
+	//
+	// // if a fragment is not broken, we have an adjacent neigbhor
+	// // so it doesn't have to break
+	// if (!temporaryFragment.isBroken()) {
+	// breaks = false;
+	// }
+	// }
+	//
+	// if (breaks) {
+	//
+	// breakFragment(fragment, p, box2d, velocity, i);
+	// }
+	// }
+
+	public void breakFragment(Fragment fragment, PApplet p, Box2DProcessing box2d, PVector velocity,
+			int i) {
+
+		// TODO check velocity and angular values
+		box2dWorldPolygons.add(new Polygon(p, box2d, fragment, velocity, 5));
+
+		// Remove fragment from List, since it's broken out
+		fragment.setBroken(true);
+
+		for (Fragment fragment2 : fragment.getNeighbors()) {
+
+			if (fragment2.isBorderFragment() || fragment2.isBroken())
+				continue;
+
+			if (createPathToBorder(0, fragment2, new ArrayList<>(Arrays.asList(fragment))) == 0) {
+				destroyAllNeighBors(fragment2, p, box2d, velocity);
+			}
+
+		}
+
+	}
+
+	private void destroyAllNeighBors(Fragment fragment2, PApplet p, Box2DProcessing box2d,
+			PVector velocity) {
+
+		box2dWorldPolygons.add(new Polygon(p, box2d, fragment2, velocity, 5));
+
+		// Remove fragment from List, since it's broken out
+		fragment2.setBroken(true);
+
+		for (Fragment fragment : fragment2.getNeighbors()) {
+
+			if (!fragment.isBroken())
+				destroyAllNeighBors(fragment, p, box2d, velocity);
+		}
+	}
+
+	public int createPathToBorder(int i, Fragment startFragment, ArrayList<Fragment> noReturn) {
+
+		noReturn.add(startFragment);
+
+		if (i > 0)
+			return i;
+
+		if (startFragment.isBorderFragment()) {
+
+			i++;
+			return i;
+		}
+
+		for (Fragment fragment : startFragment.getNeighbors()) {
+
+			if (!fragment.isBroken()) {
+
+				boolean isEqual = false;
+
+				for (Fragment fragment2 : noReturn) {
+
+					if (fragment.equals(fragment2))
+						isEqual = true;
+				}
+				if (!isEqual) {
+
+					i += createPathToBorder(i, fragment, noReturn);
+				}
+			}
+		}
+
+		return i;
+	}
+
 }

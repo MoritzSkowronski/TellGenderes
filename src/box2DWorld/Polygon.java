@@ -39,7 +39,7 @@ public class Polygon {
 		}
 
 		this.widthheight = (fragment.getMaxX() - fragment.getMinX())
-				* (fragment.getMaxY() - fragment.getMinY());
+				+ (fragment.getMaxY() - fragment.getMinY());
 
 		corners = new Vec2[realWorldCorners.length];
 		mass = fragment.getArea();
@@ -105,6 +105,12 @@ public class Polygon {
 	public boolean isDead() {
 
 		return isDead;
+	}
+	
+	public void kill(){
+		
+		box2d.destroyBody(body);
+		isDead = true;
 	}
 
 	private void testIfDead() {

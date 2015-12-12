@@ -89,19 +89,21 @@ public class OSCReceiver implements OscEventListener {
 		} else {
 			if (messageType.equals("/argusClient/personLeft")) {
 
-				handler.personLeft(message.get(0).stringValue());
-			} else if (messageType.equals("triggerzoneUpdate")) {
+				handler.personLeft(message.get(1).stringValue());
+			} else if (messageType.equals("/argusClient/triggerzone")) {
 				String id = null;
-				int pointsInsideBox = -1;
+				int pointsInsideBox = 0;
 				HashMap<Integer, Integer> pointsperPerson = new HashMap<Integer, Integer>();
+
 				for (int i = 0; i < typetag.length(); i++) {
 
 					if (typetag.charAt(i) == 's') {
 						if (message.get(i).stringValue().equals("set")) {
 
 							id = message.get(++i).stringValue();
-							pointsInsideBox = message.get(++i).intValue();
-							i++;
+							i+=2;
+							pointsInsideBox = message.get(i).intValue();
+							i+=2;
 							while (typetag.charAt(i) == 'i') {
 
 								pointsperPerson.put(message.get(i++).intValue(),

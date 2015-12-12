@@ -44,7 +44,7 @@ public class MovementHandler {
 			box.setPointsPerPerson(pointsperPerson);
 		} else {
 
-			triggerzones.put(id, new TriggerBox(pointsInsideBox, pointsperPerson));
+			triggerzones.put(id, new TriggerBox(id, pointsInsideBox, pointsperPerson));
 		}
 
 		triggerUpdate = true;
@@ -84,6 +84,11 @@ public class MovementHandler {
 	public ConcurrentHashMap<String, Person> getPersons(){
 		
 		return persons;
+	}
+	
+	public ConcurrentHashMap<String, TriggerBox> getTriggerZones(){
+		
+		return triggerzones;
 	}
 
 }

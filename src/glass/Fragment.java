@@ -12,10 +12,12 @@ public class Fragment {
 	private PVector centroid;
 	private ArrayList<PVector> corners;
 	private ArrayList<Line> lines;
+	private ArrayList<Fragment> neighbors;
 	private int lineVisibiltyCounter;
 	private boolean hasBroken;
 	private boolean isVisible;
 	private float area;
+	private boolean isBorderFragment;
 
 	public Fragment(ArrayList<PVector> corners) {
 
@@ -25,6 +27,8 @@ public class Fragment {
 		hasBroken = false;
 		lines = new ArrayList<Line>();
 		lineVisibiltyCounter = 0;
+		neighbors = new ArrayList<Fragment>();
+		isBorderFragment = false;
 	}
 
 	public float getMinX() {
@@ -229,5 +233,25 @@ public class Fragment {
 	public void addLine(Line line) {
 
 		lines.add(line);
+	}
+
+	public void addNeighbor(Fragment fragment) {
+
+		neighbors.add(fragment);
+	}
+
+	public ArrayList<Fragment> getNeighbors() {
+
+		return neighbors;
+	}
+	
+	public void setBorderFragment(boolean isBorderFragment){
+		
+		this.isBorderFragment = isBorderFragment;
+	}
+	
+	public boolean isBorderFragment(){
+		
+		return isBorderFragment;
 	}
 }

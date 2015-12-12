@@ -35,7 +35,7 @@ public class Image {
 
 				i++;
 				resizedWidth = tempResizeWidth * i;
-				resizedHeight = tempResizeWidth * i;
+				resizedHeight = tempResizeHeight * i;
 			}
 
 			if (i != 1) {

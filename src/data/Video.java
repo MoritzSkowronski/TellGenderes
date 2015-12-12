@@ -36,7 +36,7 @@ public class Video {
 
 				i++;
 				resizedWidth = tempResizeWidth * i;
-				resizedHeight = tempResizeWidth * i;
+				resizedHeight = tempResizeHeight * i;
 			}
 
 			resizedWidth -= tempResizeWidth;

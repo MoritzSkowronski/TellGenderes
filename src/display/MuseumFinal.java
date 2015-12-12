@@ -2,6 +2,7 @@ package display;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
 
 import box2DWorld.Polygon;
 import data.ContentGenerator;
@@ -20,6 +21,7 @@ import helpers.Stage;
 import movement.MovementHandler;
 import movement.OSCReceiver;
 import persons.Person;
+import persons.TriggerBox;
 import processing.core.PApplet;
 import processing.core.PVector;
 import shiffman.box2d.Box2DProcessing;
@@ -89,18 +91,20 @@ public class MuseumFinal extends PApplet {
 
 		box2dWorld = new Box2DProcessing(this);
 		box2dWorld.createWorld();
-		box2dWorld.setGravity(0, -100);
+		box2dWorld.setGravity(0, -150);
 
 		movementHandler = new MovementHandler();
 
 		receiver = new OSCReceiver(movementHandler);
 
 		running = true;
+
+		frameRate(30);
 	}
 
 	@Override
 	public void draw() {
-		frameRate(30);
+		// frameRate(30);
 
 		background(firstColor);
 		box2dWorld.step();
@@ -146,6 +150,10 @@ public class MuseumFinal extends PApplet {
 
 							Iterator<Person> iterator = movementHandler.getPersons().values()
 									.iterator();
+
+							Iterator<TriggerBox> boxIterator = movementHandler.getTriggerZones()
+									.values().iterator();
+
 							while (iterator.hasNext()) {
 
 								Person person = iterator.next();
@@ -169,6 +177,29 @@ public class MuseumFinal extends PApplet {
 												height / 2, 2, velocity);
 									} else {
 										if (centroid.y < 0.6) {
+											// while (boxIterator.hasNext()) {
+											//
+											// TriggerBox box =
+											// boxIterator.next();
+											// if (box.getPointsInsideBox() !=
+											// 0) {
+											// System.out.println("----Person-----");
+											// System.out.println(person.getId());
+											// Iterator<Integer> hm =
+											// box.getPointsPerPerson()
+											// .keySet().iterator();
+											// while(hm.hasNext()){
+											// System.out.println("----trigger----");
+											// System.out.println(hm.next());
+											// }
+											// // if
+											// // (box.getPointsPerPerson()
+											// // .containsKey(person.getId()))
+											// // {
+											// //
+											// // }
+											// }
+											// }
 
 											glass.getCrack().breakParts(this, box2dWorld,
 													centroid.x, height / 2, 3, velocity);
@@ -204,8 +235,6 @@ public class MuseumFinal extends PApplet {
 
 			// Get current Crack
 			Crack crack = glass.getCrack();
-
-			// TODO update Crack
 
 			// Paint Image or Video
 

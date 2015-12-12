@@ -33,8 +33,9 @@ public class TriggerBox {
 	 * @param color
 	 *            color of Box
 	 */
-	public TriggerBox(int depthPoints, HashMap<Integer, Integer> pointsPerPerson) {
+	public TriggerBox(String id, int depthPoints, HashMap<Integer, Integer> pointsPerPerson) {
 
+		this.id = id;
 		this.depthPointsInBox = depthPoints;
 		this.pointsPerPerson = pointsPerPerson;
 	}
