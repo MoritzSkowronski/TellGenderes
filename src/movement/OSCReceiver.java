@@ -18,7 +18,7 @@ public class OSCReceiver implements OscEventListener {
 	private OscProperties properties;
 
 	public OSCReceiver(MovementHandler handler) {
-		
+
 		properties = new OscProperties();
 		properties.setDatagramSize(65536);
 		properties.setListeningPort(9999);
@@ -29,7 +29,7 @@ public class OSCReceiver implements OscEventListener {
 	public void interrupt() {
 		oscReceiver.stop();
 	}
-	
+
 	@Override
 	public void oscEvent(OscMessage message) {
 
@@ -93,7 +93,7 @@ public class OSCReceiver implements OscEventListener {
 			} else if (messageType.equals("/argusClient/triggerzone")) {
 				String id = null;
 				int pointsInsideBox = 0;
-				HashMap<Integer, Integer> pointsperPerson = new HashMap<Integer, Integer>();
+				HashMap<String, Integer> pointsperPerson = new HashMap<String, Integer>();
 
 				for (int i = 0; i < typetag.length(); i++) {
 
@@ -101,12 +101,13 @@ public class OSCReceiver implements OscEventListener {
 						if (message.get(i).stringValue().equals("set")) {
 
 							id = message.get(++i).stringValue();
-							i+=2;
+							i += 2;
 							pointsInsideBox = message.get(i).intValue();
-							i+=2;
-							while (typetag.charAt(i) == 'i') {
+							i += 2;
+							while (typetag.charAt(i) == 's'
+									&& !message.get(i).stringValue().equals("fseq")) {
 
-								pointsperPerson.put(message.get(i++).intValue(),
+								pointsperPerson.put(message.get(i++).stringValue(),
 										message.get(i++).intValue());
 							}
 							i--;
@@ -114,7 +115,7 @@ public class OSCReceiver implements OscEventListener {
 							if (message.get(i).stringValue().equals("fseq")) {
 
 								handler.updateTriggerZone(id, pointsInsideBox, pointsperPerson,
-										(long)(message.get(++i).intValue()));
+										(long) (message.get(++i).intValue()));
 							}
 						}
 					}

@@ -11,7 +11,7 @@ public class TriggerBox {
 	private int depthPointsInBox;
 
 	// <PersonID, Points of that Person>
-	private HashMap<Integer, Integer> pointsPerPerson;
+	private HashMap<String, Integer> pointsPerPerson;
 
 	/**
 	 * Constructs a new TriggerBox
@@ -33,7 +33,7 @@ public class TriggerBox {
 	 * @param color
 	 *            color of Box
 	 */
-	public TriggerBox(String id, int depthPoints, HashMap<Integer, Integer> pointsPerPerson) {
+	public TriggerBox(String id, int depthPoints, HashMap<String, Integer> pointsPerPerson) {
 
 		this.id = id;
 		this.depthPointsInBox = depthPoints;
@@ -46,7 +46,7 @@ public class TriggerBox {
 		this.id = id;
 	}
 
-	public void setPointsPerPerson(HashMap<Integer, Integer> depthPointsPerPerson) {
+	public void setPointsPerPerson(HashMap<String, Integer> depthPointsPerPerson) {
 
 		this.pointsPerPerson = depthPointsPerPerson;
 	}
@@ -65,7 +65,7 @@ public class TriggerBox {
 		return depthPointsInBox;
 	}
 
-	public HashMap<Integer, Integer> getPointsPerPerson() {
+	public HashMap<String, Integer> getPointsPerPerson() {
 		return pointsPerPerson;
 	}
 

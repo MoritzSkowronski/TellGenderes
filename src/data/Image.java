@@ -23,7 +23,7 @@ public class Image {
 		resizedHeight = originalHeight;
 
 		// resize Image
-		if (image.width > MuseumFinal.maxImageWidth || image.height > MuseumFinal.maxImageHeight) {
+		if (image.width >= MuseumFinal.maxImageWidth || image.height >= MuseumFinal.maxImageHeight) {
 
 			int tempResizeWidth = image.width / MuseumFinal.scaleFactor;
 			int tempResizeHeight = image.height / MuseumFinal.scaleFactor;

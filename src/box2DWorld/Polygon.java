@@ -8,6 +8,7 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.FixtureDef;
 
+import display.MuseumFinal;
 import glass.Fragment;
 import processing.core.PApplet;
 import processing.core.PVector;
@@ -89,8 +90,8 @@ public class Polygon {
 		p.pushMatrix();
 		p.translate(pos.x, pos.y);
 		p.rotate(-a);
-		p.fill(255);
-		p.stroke(0);
+		p.fill(p.color(139,137,137,200));
+		p.stroke(MuseumFinal.secondColor);
 		p.beginShape();
 		// For every vertex, convert to pixel vector
 		for (int i = 0; i < ps.getVertexCount(); i++) {

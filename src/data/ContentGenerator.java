@@ -45,7 +45,8 @@ public class ContentGenerator {
 
 					list.add(new Image(p, p.loadImage(fileName)));
 				}
-				if (fileName.endsWith(".avi") || fileName.endsWith(".mp4")) {
+				if (fileName.endsWith(".avi") || fileName.endsWith(".mp4")
+						|| fileName.endsWith(".mov")) {
 
 					list.add(new Video(p, new Movie(p, fileName)));
 				}
@@ -64,6 +65,9 @@ public class ContentGenerator {
 			}
 		}
 
+		if (possibleImages.size() < 1)
+			return null;
+
 		int index = randomizer.nextInt(possibleImages.size());
 
 		return possibleImages.get(index);
@@ -75,17 +79,22 @@ public class ContentGenerator {
 		ArrayList<Video> possibleMovies = new ArrayList<Video>();
 		for (Video video : (ArrayList<Video>) videos) {
 
-			if (video.getResizedWidth() < maxWidth && video.getResizedWidth() < maxHeight) {
+			if (video.getResizedWidth() <= maxWidth && video.getResizedHeight() <= maxHeight) {
+
 				possibleMovies.add(video);
 			}
 		}
 
-		if (possibleMovies.size() < 0)
+		if (possibleMovies.size() < 1)
 			return null;
 
 		int index = randomizer.nextInt(possibleMovies.size());
 
-		return possibleMovies.get(index);
+		Video video = possibleMovies.get(index);
+
+		video.getMovie().jump(0);
+
+		return video;
 	}
 
 	public boolean isReady() {

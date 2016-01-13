@@ -35,7 +35,7 @@ public class MovementHandler {
 	}
 
 	public void updateTriggerZone(String id, int pointsInsideBox,
-			HashMap<Integer, Integer> pointsperPerson, Long valueOf) {
+			HashMap<String, Integer> pointsperPerson, Long valueOf) {
 
 		if (triggerzones.containsKey(id)) {
 

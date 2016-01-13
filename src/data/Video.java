@@ -15,15 +15,14 @@ public class Video {
 	public Video(PApplet p, Movie video) {
 		this.video = video;
 		this.video.play();
-		this.video.volume(0);
 		this.video.read();
 		
 		resizedWidth = this.video.width;
 		resizedHeight = this.video.height;
 
 		// resize Video
-		if (resizedWidth > MuseumFinal.maxImageWidth
-				|| resizedHeight > MuseumFinal.maxImageHeight) {
+		if (resizedWidth >= 1280
+				|| resizedHeight >= 720) {
 			
 			int tempResizeWidth = this.video.width / MuseumFinal.scaleFactor;
 			int tempResizeHeight = this.video.height / MuseumFinal.scaleFactor;
@@ -31,8 +30,8 @@ public class Video {
 			resizedHeight = tempResizeHeight;
 
 			int i = 1;
-			while (resizedWidth <= MuseumFinal.maxImageWidth
-					&& resizedHeight <= MuseumFinal.maxImageHeight) {
+			while (resizedWidth <= 1280
+					&& resizedHeight <= 720) {
 
 				i++;
 				resizedWidth = tempResizeWidth * i;
@@ -42,6 +41,8 @@ public class Video {
 			resizedWidth -= tempResizeWidth;
 			resizedHeight -= tempResizeHeight;
 		}
+		
+		this.video.pause();
 	}
 
 	public Movie getMovie() {

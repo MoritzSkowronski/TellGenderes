@@ -42,8 +42,11 @@ public class GlassPlane {
 	 * @param crackheight
 	 */
 	public void crack(int centroidX, int centroidY, Image image) {
-		
-		if(image == null)
+
+		if (image == null)
+			return;
+
+		if (image.getResizedWidth() == 0 || image.getResizedHeight() == 0)
 			return;
 
 		Crack temporaryCrack = VoronoiBuilder.createVoronoiCrack(p, centroidX, centroidY,
@@ -59,6 +62,9 @@ public class GlassPlane {
 	public void crack(int centroidX, int centroidY, Video video) {
 
 		if (video == null)
+			return;
+
+		if (video.getResizedWidth() == 0 || video.getResizedHeight() == 0)
 			return;
 
 		Crack temporaryCrack = VoronoiBuilder.createVoronoiCrack(p, centroidX, centroidY,

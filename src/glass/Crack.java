@@ -28,7 +28,6 @@ public class Crack {
 
 	private int visibility;
 	private long breakTime;
-	private long fadeTime;
 
 	private long lastUpdate;
 
@@ -119,11 +118,24 @@ public class Crack {
 	public void breakCrack(PApplet p, Box2DProcessing box2d, PVector velocity) {
 
 		lastUpdate = System.currentTimeMillis();
+		
+		boolean alreadyBroken = true;
 
 		for (Fragment fragment : fragments) {
 
-			if (!fragment.isBroken())
-				box2dWorldPolygons.add(new Polygon(p, box2d, fragment, velocity, 50));
+			if (!fragment.isBroken()) {
+				box2dWorldPolygons
+						.add(new Polygon(p, box2d, fragment, velocity, p.random(50, 120)));
+				fragment.setBroken(true);
+				alreadyBroken = false;
+			}
+		}
+		
+		if(!alreadyBroken){
+			
+			MuseumFinal.glassBreakSamples.get(MuseumFinal.breakCounter).trigger();
+			MuseumFinal.breakCounter++;
+			MuseumFinal.breakCounter = MuseumFinal.breakCounter % MuseumFinal.glassBreakSamples.size();
 		}
 
 		// make all hidden lines visible
@@ -137,6 +149,36 @@ public class Crack {
 		fragments.clear();
 
 		stage = Stage.BROKEN;
+		if (cracktype == CrackType.MOVIE)
+			movie.getMovie().play();
+		breakTime = System.currentTimeMillis();
+	}
+
+	public void letCrackFall(PApplet p, Box2DProcessing box2d, PVector velocity) {
+
+		lastUpdate = System.currentTimeMillis();
+
+		for (Fragment fragment : fragments) {
+
+			if (!fragment.isBroken()) {
+				box2dWorldPolygons.add(new Polygon(p, box2d, fragment, velocity, 30));
+				fragment.setBroken(true);
+			}
+		}
+
+		// make all hidden lines visible
+		for (Fragment fragment : hiddenFragments) {
+
+			for (Line line : fragment.getLines()) {
+
+				line.setVisiblity(true);
+			}
+		}
+		fragments.clear();
+
+		stage = Stage.BROKEN;
+		if (cracktype == CrackType.MOVIE)
+			movie.getMovie().play();
 		breakTime = System.currentTimeMillis();
 	}
 
@@ -145,11 +187,10 @@ public class Crack {
 
 		lastUpdate = System.currentTimeMillis();
 
-		// If there are less than half of the fragments break all
-		// if (fragments.size() / 2 < crackAmount) {
-		//
-		// breakCrack(p, box2d, velocity);
-		// }
+		if (crackAmount > MuseumFinal.destroyableCuts / 1.3f) {
+
+			letCrackFall(p, box2d, velocity);
+		}
 
 		// calculate rectangle size
 		float rectangleWidth = minInteractionWidthHeight.x * interactionStep;
@@ -188,7 +229,6 @@ public class Crack {
 			// breaks out
 			if (fragment.isVisible() && !fragment.isBroken() && fragmentIsInRange) {
 
-				// TODO maybe also use velocity?!
 				if (Math.random() < 0.01f) {
 
 					breakFragment(fragment, p, box2d, velocity, 0);
@@ -244,11 +284,9 @@ public class Crack {
 
 				if (movie.getMovie().available()) {
 					movie.getMovie().read();
-				}
+				} else if (movie.getMovie().duration() == movie.getMovie().time()) {
 
-				if (movie.getMovie().time() == movie.getMovie().duration()) {
-					movie.getMovie().jump(0);
-					movie.getMovie().read();
+					movie.getMovie().pause();
 					stage = Stage.FADING;
 				}
 			}
@@ -278,33 +316,12 @@ public class Crack {
 		}
 	}
 
-	// public void breakLooseFragments(Fragment fragment, PApplet p,
-	// Box2DProcessing box2d,
-	// PVector velocity, int i) {
-	//
-	// boolean breaks = true;
-	//
-	// // Check all neighbors of the given fragment
-	// for (Fragment temporaryFragment : fragment.getNeighbors()) {
-	//
-	// // if a fragment is not broken, we have an adjacent neigbhor
-	// // so it doesn't have to break
-	// if (!temporaryFragment.isBroken()) {
-	// breaks = false;
-	// }
-	// }
-	//
-	// if (breaks) {
-	//
-	// breakFragment(fragment, p, box2d, velocity, i);
-	// }
-	// }
-
 	public void breakFragment(Fragment fragment, PApplet p, Box2DProcessing box2d, PVector velocity,
 			int i) {
 
 		// TODO check velocity and angular values
 		box2dWorldPolygons.add(new Polygon(p, box2d, fragment, velocity, 5));
+		crackAmount++;
 
 		// Remove fragment from List, since it's broken out
 		fragment.setBroken(true);
@@ -326,6 +343,7 @@ public class Crack {
 			PVector velocity) {
 
 		box2dWorldPolygons.add(new Polygon(p, box2d, fragment2, velocity, 5));
+		crackAmount++;
 
 		// Remove fragment from List, since it's broken out
 		fragment2.setBroken(true);

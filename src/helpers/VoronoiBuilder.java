@@ -25,6 +25,8 @@ public class VoronoiBuilder {
 	 */
 	public static Crack createVoronoiCrack(PApplet p, int centerX, int centerY, int width,
 			int height) {
+		
+		MuseumFinal.destroyableCuts = 0;
 
 		ArrayList<Fragment> fragments = new ArrayList<Fragment>();
 		ArrayList<Fragment> hiddenFragments = new ArrayList<Fragment>();
@@ -75,6 +77,8 @@ public class VoronoiBuilder {
 
 			} else {
 
+				MuseumFinal.destroyableCuts++;
+				
 				addLines(temporaryFragment, LineType.FRAGMENT, centerX, centerY);
 
 				fragments.add(temporaryFragment);

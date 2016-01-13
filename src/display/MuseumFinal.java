@@ -8,6 +8,7 @@ import box2DWorld.Polygon;
 import data.ContentGenerator;
 import ddf.minim.AudioOutput;
 import ddf.minim.AudioPlayer;
+import ddf.minim.AudioSample;
 import ddf.minim.Minim;
 import ddf.minim.effects.BandPass;
 import ddf.minim.ugens.FilePlayer;
@@ -28,8 +29,8 @@ import shiffman.box2d.Box2DProcessing;
 
 public class MuseumFinal extends PApplet {
 
-	public static final int firstColor = 255;
-	public static final int secondColor = 0;
+	public final int firstColor = color(139, 137, 137);
+	public static final int secondColor = 255;
 	public static final int strokeStrength = 1;
 
 	public static final int formFactorX = 16;
@@ -43,6 +44,7 @@ public class MuseumFinal extends PApplet {
 	public static final int showTime = 6000;
 
 	public static final int cutAmount = 250;
+	public static int destroyableCuts = 0;
 	public static final int interactionSteps = 5;
 
 	private MovementHandler movementHandler;
@@ -56,17 +58,22 @@ public class MuseumFinal extends PApplet {
 
 	private ContentGenerator generator;
 
+	public static Minim minim;
+	public static ArrayList<AudioSample> glassBreakSamples;
+	public static int breakCounter;
+
 	@Override
 	public void settings() {
 
-		size(1280, 800, P2D);
-		// fullScreen(P2D);
+		// size(1280,800, P2D);
+		fullScreen(P2D);
 		smooth(8);
 	}
 
 	@Override
 	public void setup() {
 
+		noCursor();
 		background(firstColor);
 		maxImageWidth = width;
 		maxImageHeight = height;
@@ -75,19 +82,10 @@ public class MuseumFinal extends PApplet {
 
 		glass = new GlassPlane(this, maxImageWidth, maxImageHeight);
 
-		generator = new ContentGenerator(this, "/Users/Moritz/Dropbox/TellImage",
-				"/Users/Moritz/Dropbox/TellVideo");
+		generator = new ContentGenerator(this, "/Users/Moritz/Desktop/TellImage",
+				"/Users/Moritz/Desktop/TellVideo");
 
-		//
-		// Minim minim = new Minim(this);
-		// AudioOutput output = minim.getLineOut();
-		// FilePlayer sound1 = new
-		// FilePlayer(minim.loadFileStream("/Users/Moritz/Dropbox/Sound/Crack/SuddenCrack.wav"));
-		// BandPass bpf = new BandPass(440, 20, output.sampleRate());
-		// bpf.setFreq(300);
-		// bpf.setBandWidth(500);
-		// sound1.patch(bpf).patch(output);
-		// sound1.loop();
+		initiateAudio();
 
 		box2dWorld = new Box2DProcessing(this);
 		box2dWorld.createWorld();
@@ -108,6 +106,7 @@ public class MuseumFinal extends PApplet {
 
 		background(firstColor);
 		box2dWorld.step();
+		box2dWorld.step();
 		strokeWeight(strokeStrength);
 
 		updateCrack();
@@ -115,7 +114,7 @@ public class MuseumFinal extends PApplet {
 		displayAll();
 
 		fill(0);
-		text(frameRate, 20, 20);
+		// text(frameRate, 20, 20);
 	}
 
 	public void updateCrack() {
@@ -124,7 +123,7 @@ public class MuseumFinal extends PApplet {
 
 			if (glass.getCrack() == null) {
 
-				if (Math.random() < 0) {
+				if (Math.random() < 0.4f) {
 
 					glass.crack(width / 2, height / 2,
 							generator.getRandomVideo(maxImageWidth, maxImageHeight));
@@ -145,75 +144,81 @@ public class MuseumFinal extends PApplet {
 					if (glass.getCrack().getStage() == Stage.WHOLE) {
 
 						// glass.getCrack().breakParts(this, box2dWorld, mouseX,
-						// mouseY, 1, PVector.random2D());
+						// mouseY, 3,
+						// PVector.random2D());
 						if (movementHandler.updateReady()) {
 
 							Iterator<Person> iterator = movementHandler.getPersons().values()
 									.iterator();
 
-							Iterator<TriggerBox> boxIterator = movementHandler.getTriggerZones()
-									.values().iterator();
-
 							while (iterator.hasNext()) {
 
 								Person person = iterator.next();
+
+								// Iterator<TriggerBox> boxIterator =
+								// movementHandler.getTriggerZones()
+								// .values().iterator();
+								//
+								// while (boxIterator.hasNext()) {
+								//
+								// TriggerBox box = boxIterator.next();
+								//
+								// if (box.getID().equals("0-Triggerbox 1")) {
+								//
+								// if
+								// (box.getPointsPerPerson().containsKey(person.getId()))
+								// {
+								//
+								// }
+								// }
+								// break;
+								// }
+
 								PVector centroid = person.getCentroid();
+								if (centroid.x > 1 || centroid.y > 1)
+									continue;
 								PVector velocity = person.getVelocity();
 
 								if (velocity == null) {
 									velocity = PVector.random2D();
 								}
+
+								if (centroid.x < 0.1) {
+
+									continue;
+								}
+
+								if (centroid.x > 0.7) {
+
+									continue;
+								}
+
 								centroid.x *= width;
 
-								// how much will break
-								if (centroid.y < 0.2) {
+								if (centroid.y < 0.3) {
 
 									glass.getCrack().breakParts(this, box2dWorld, centroid.x,
 											height / 2, 1, velocity);
+								} else if (centroid.y < 0.5) {
+
+									glass.getCrack().breakParts(this, box2dWorld, centroid.x,
+											height / 2, 3, velocity);
 								} else {
-									if (centroid.y < 0.4) {
+									if (centroid.y < 0.7) {
 
 										glass.getCrack().breakParts(this, box2dWorld, centroid.x,
-												height / 2, 2, velocity);
+												height / 2, 4, velocity);
 									} else {
-										if (centroid.y < 0.6) {
-											// while (boxIterator.hasNext()) {
-											//
-											// TriggerBox box =
-											// boxIterator.next();
-											// if (box.getPointsInsideBox() !=
-											// 0) {
-											// System.out.println("----Person-----");
-											// System.out.println(person.getId());
-											// Iterator<Integer> hm =
-											// box.getPointsPerPerson()
-											// .keySet().iterator();
-											// while(hm.hasNext()){
-											// System.out.println("----trigger----");
-											// System.out.println(hm.next());
-											// }
-											// // if
-											// // (box.getPointsPerPerson()
-											// // .containsKey(person.getId()))
-											// // {
-											// //
-											// // }
-											// }
-											// }
+										if (centroid.y < 1) {
 
-											glass.getCrack().breakParts(this, box2dWorld,
-													centroid.x, height / 2, 3, velocity);
-										} else {
-											if (centroid.y < 0.8) {
+											if (person.getAge() > 10) {
+
+												glass.getCrack().breakCrack(this, box2dWorld,
+														velocity);
+											} else {
 
 												glass.getCrack().breakParts(this, box2dWorld,
 														centroid.x, height / 2, 4, velocity);
-											} else {
-												if (centroid.y < 1) {
-
-													glass.getCrack().breakCrack(this, box2dWorld,
-															velocity);
-												}
 											}
 										}
 									}
@@ -248,6 +253,7 @@ public class MuseumFinal extends PApplet {
 				} else {
 
 					tint(255, crack.getVisiblity());
+
 					image(crack.getVideo().getMovie(), crack.getBoundingBox().get(0).x,
 							crack.getBoundingBox().get(0).y);
 				}
@@ -354,6 +360,20 @@ public class MuseumFinal extends PApplet {
 				glass.getCrack().breakCrack(this, box2dWorld, PVector.random2D());
 			}
 		}
+	}
 
+	public void initiateAudio() {
+
+		minim = new Minim(this);
+		AudioPlayer loopPlayer = minim.loadFile("/Users/Moritz/Desktop/FinalSound.mp3");
+		loopPlayer.loop();
+
+		glassBreakSamples = new ArrayList<AudioSample>();
+		glassBreakSamples.add(minim.loadSample("/Users/Moritz/Desktop/SoundFinal/1.wav"));
+		glassBreakSamples.add(minim.loadSample("/Users/Moritz/Desktop/SoundFinal/2.wav"));
+		glassBreakSamples.add(minim.loadSample("/Users/Moritz/Desktop/SoundFinal/3.wav"));
+		glassBreakSamples.add(minim.loadSample("/Users/Moritz/Desktop/SoundFinal/4.wav"));
+		glassBreakSamples.add(minim.loadSample("/Users/Moritz/Desktop/SoundFinal/5.wav"));
+		breakCounter = 0;
 	}
 }
